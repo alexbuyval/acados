@@ -89,7 +89,6 @@
 #define NGN    {{ dims.ng_e }}
 #define NY     {{ dims.ny }}
 #define NYN    {{ dims.ny_e }}
-#define N      {{ dims.N }}
 #define NH     {{ dims.nh }}
 #define NPHI   {{ dims.nphi }}
 #define NHN    {{ dims.nh_e }}
@@ -176,7 +175,7 @@ external_function_param_casadi ext_cost_e_fun_jac_hess;
 {%- endif %}
 
 
-int acados_create()
+int acados_create(int N, double time_step)
 {
     int status = 0;
 
@@ -799,9 +798,9 @@ int acados_create()
     nlp_in = ocp_nlp_in_create(nlp_config, nlp_dims);
 
     double time_steps[N];
-    {%- for j in range(end=dims.N) %}
-    time_steps[{{ j }}] = {{ solver_options.time_steps[j] }};
-    {%- endfor %}
+    for (int i = 0; i < N; i++) {
+      time_steps[i] = time_step;
+    }
 
     for (int i = 0; i < N; i++)
     {
@@ -1847,7 +1846,7 @@ int acados_solve()
 }
 
 
-int acados_free()
+int acados_free(int N)
 {
     // free memory
     ocp_nlp_solver_opts_destroy(nlp_opts);
@@ -1861,7 +1860,7 @@ int acados_free()
     /* free external function */
     // dynamics
 {%- if solver_options.integrator_type == "IRK" %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&impl_dae_fun[i]);
         external_function_param_casadi_free(&impl_dae_fun_jac_x_xdot_z[i]);
@@ -1878,7 +1877,7 @@ int acados_free()
     {%- endif %}
 
 {%- elif solver_options.integrator_type == "ERK" %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&forw_vde_casadi[i]);
         external_function_param_casadi_free(&expl_ode_fun[i]);
@@ -1893,7 +1892,7 @@ int acados_free()
     {%- endif %}
 
 {%- elif solver_options.integrator_type == "GNSF" %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&gnsf_phi_fun[i]);
         external_function_param_casadi_free(&gnsf_phi_fun_jac_y[i]);
@@ -1907,7 +1906,7 @@ int acados_free()
     free(gnsf_f_lo_jac_x1_x1dot_u_z);
     free(gnsf_get_matrices_fun);
 {%- elif solver_options.integrator_type == "DISCRETE" %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&discr_dyn_phi_fun[i]);
         external_function_param_casadi_free(&discr_dyn_phi_fun_jac_ut_xt[i]);
@@ -1925,7 +1924,7 @@ int acados_free()
 
     // cost
 {%- if cost.cost_type == "NONLINEAR_LS" %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&cost_y_fun[i]);
         external_function_param_casadi_free(&cost_y_fun_jac_ut_xt[i]);
@@ -1935,7 +1934,7 @@ int acados_free()
     free(cost_y_fun_jac_ut_xt);
     free(cost_y_hess);
 {%- elif cost.cost_type == "EXTERNAL" %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&ext_cost_fun[i]);
         external_function_param_casadi_free(&ext_cost_fun_jac[i]);
@@ -1957,13 +1956,13 @@ int acados_free()
 
     // constraints
 {%- if constraints.constr_type == "BGH" and dims.nh > 0 %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&nl_constr_h_fun_jac[i]);
         external_function_param_casadi_free(&nl_constr_h_fun[i]);
     }
   {%- if solver_options.hessian_approx == "EXACT" %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&nl_constr_h_fun_jac_hess[i]);
     }
@@ -1975,7 +1974,7 @@ int acados_free()
   {%- endif %}
 
 {%- elif constraints.constr_type == "BGP" and dims.nphi > 0 %}
-    for (int i = 0; i < {{ dims.N }}; i++)
+    for (int i = 0; i < N; i++)
     {
         external_function_param_casadi_free(&phi_constraint[i]);
     }

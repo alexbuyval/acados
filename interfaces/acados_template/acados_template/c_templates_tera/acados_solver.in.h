@@ -41,10 +41,10 @@
 extern "C" {
 #endif
 
-int acados_create();
+int acados_create(int N, double time_step);
 int acados_update_params(int stage, double *value, int np);
 int acados_solve();
-int acados_free();
+int acados_free(int N);
 void acados_print_stats();
 
 ocp_nlp_in * acados_get_nlp_in();

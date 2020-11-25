@@ -691,7 +691,8 @@ class AcadosOcpSolver:
 
         # get
         self.shared_lib = CDLL(self.shared_lib_name)
-        self.shared_lib.acados_create()
+        self.shared_lib.acados_create.argtypes=[c_int, c_double]
+        self.shared_lib.acados_create(self.N, acados_ocp.solver_options.Tsim)
         self.solver_created = True
 
         self.shared_lib.acados_get_nlp_opts.restype = c_void_p
@@ -1230,7 +1231,7 @@ class AcadosOcpSolver:
 
     def __del__(self):
         if self.solver_created:
-            self.shared_lib.acados_free()
+            self.shared_lib.acados_free(self.N)
 
             try:
                 self.dlclose(self.shared_lib._handle)
