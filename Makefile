@@ -37,11 +37,11 @@
 # default make target
 all: static_library
 
-
+ARCH=$(uname -m)
 
 # include config & tailored rules
-include ./Makefile.rule
-include ./Makefile.osqp
+include ./Makefile.rule.$(ARCH)
+include ./Makefile.osqp.$(ARCH)
 
 # acados sources
 OBJS =
