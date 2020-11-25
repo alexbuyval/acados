@@ -37,7 +37,7 @@
 # default make target
 all: static_library
 
-ARCH=$(uname -m)
+ARCH=$(shell uname -m)
 
 # include config & tailored rules
 include ./Makefile.rule.$(ARCH)
