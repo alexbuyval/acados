@@ -104,10 +104,10 @@ typedef struct nlp_solver_capsule
 nlp_solver_capsule * {{ model.name }}_acados_create_capsule();
 int {{ model.name }}_acados_free_capsule(nlp_solver_capsule *capsule);
 
-int {{ model.name }}_acados_create(nlp_solver_capsule * capsule);
-int {{ model.name }}_acados_update_params(nlp_solver_capsule * capsule, int stage, double *value, int np);
+int {{ model.name }}_acados_create(nlp_solver_capsule * capsule, int N, double time_step);
+int {{ model.name }}_acados_update_params(nlp_solver_capsule * capsule, int stage, double *value, int np, int N);
 int {{ model.name }}_acados_solve(nlp_solver_capsule * capsule);
-int {{ model.name }}_acados_free(nlp_solver_capsule * capsule);
+int {{ model.name }}_acados_free(nlp_solver_capsule * capsule, int N);
 void {{ model.name }}_acados_print_stats(nlp_solver_capsule * capsule);
 
 ocp_nlp_in *{{ model.name }}_acados_get_nlp_in(nlp_solver_capsule * capsule);

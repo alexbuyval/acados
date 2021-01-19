@@ -697,9 +697,9 @@ class AcadosOcpSolver:
         self.capsule = getattr(self.shared_lib, f"{model.name}_acados_create_capsule")()
 
         # create solver
-        getattr(self.shared_lib, f"{model.name}_acados_create").argtypes = [c_void_p]
+        getattr(self.shared_lib, f"{model.name}_acados_create").argtypes = [c_void_p, c_int, c_double]
         getattr(self.shared_lib, f"{model.name}_acados_create").restype = c_int
-        assert getattr(self.shared_lib, f"{model.name}_acados_create")(self.capsule)==0
+        assert getattr(self.shared_lib, f"{model.name}_acados_create")(self.capsule, self.N, acados_ocp.solver_options.Tsim)==0
         self.solver_created = True
 
         # get pointers solver
@@ -1253,9 +1253,9 @@ class AcadosOcpSolver:
         model = self.acados_ocp.model
 
         if self.solver_created:
-            getattr(self.shared_lib, f"{model.name}_acados_free").argtypes = [c_void_p]
+            getattr(self.shared_lib, f"{model.name}_acados_free").argtypes = [c_void_p, c_int]
             getattr(self.shared_lib, f"{model.name}_acados_free").restype = c_int
-            getattr(self.shared_lib, f"{model.name}_acados_free")(self.capsule)
+            getattr(self.shared_lib, f"{model.name}_acados_free")(self.capsule, self.N)
 
             getattr(self.shared_lib, f"{model.name}_acados_free_capsule").argtypes = [c_void_p]
             getattr(self.shared_lib, f"{model.name}_acados_free_capsule").restype = c_int
