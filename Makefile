@@ -39,8 +39,10 @@ all: static_library
 
 
 
+ARCH=$(shell uname -m)
+
 # include config & tailored rules
-include ./Makefile.rule
+include ./Makefile.rule.$(ARCH)
 include ./Makefile.osqp
 
 # acados sources
